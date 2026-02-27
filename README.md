@@ -101,4 +101,15 @@ src/
 - **Design system enxuto**: componentes em `components/ui` (baseados em Radix + Tailwind) garantem aparência e acessibilidade consistentes sem duplicar código.
 - **Sem backend**: os dados ficam no `localStorage`; a aplicação é estática do ponto de vista de servidor, o que facilita deploy e testes.
 
-As imagens e capturas de tela do projeto podem ser adicionadas diretamente ao repositório no GitHub (por exemplo, na pasta `docs/` ou na raiz) e referenciadas neste README quando desejar.
+## Imagens do projeto
+<img width="1122" height="888" alt="image" src="https://github.com/user-attachments/assets/4c4898a7-7ea8-4730-bb79-d1a3d3bd8021" />
+<img width="1112" height="883" alt="image" src="https://github.com/user-attachments/assets/ec3c0274-38a9-4ebc-82c4-170e0182d9a1" />
+<img width="1108" height="881" alt="image" src="https://github.com/user-attachments/assets/554f4c76-c3b0-4eff-b8fc-838e29a43182" />
+<img width="585" height="469" alt="image" src="https://github.com/user-attachments/assets/9cc41cd9-86fa-4b89-9dbc-b728ea60f37a" />
+<img width="514" height="592" alt="image" src="https://github.com/user-attachments/assets/3fd50014-c341-4a87-ae2b-08f58fc0bb89" />
+<img width="496" height="587" alt="image" src="https://github.com/user-attachments/assets/9649cd01-fe7d-428a-b00a-b7640a660791" />
+
+
+
+
+
