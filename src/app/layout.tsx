@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Agenda",
-  description: "Agenda estilo Google Calendar (mock)",
+  description: "Agendamentos pessoais",
 };
 
 export default function RootLayout({
