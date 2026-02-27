@@ -11,6 +11,14 @@ import type {
   CalendarEventDraft,
 } from "@/components/calendar/types";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/utils/cnUtils";
@@ -113,17 +121,17 @@ export function EventForm({
     [initialEvent, defaultStart, defaultEnd],
   );
 
-  const {
-    register,
-    watch,
-    setValue,
-    handleSubmit,
-    formState: { errors, isSubmitting, isValid },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues,
     mode: "onChange",
   });
+
+  const {
+    watch,
+    setValue,
+    formState: { isSubmitting, isValid },
+  } = form;
 
   const startLocal = watch("startLocal");
   const endLocal = watch("endLocal");
@@ -153,122 +161,123 @@ export function EventForm({
   const isEditMode = Boolean(initialEvent && onSubmitUpdate);
 
   return (
-    <form
-      className={cn("grid gap-4", className)}
-      onSubmit={handleSubmit(async (values) => {
-        const start = fromLocalDatetimeInputValue(values.startLocal)!;
-        const end = fromLocalDatetimeInputValue(values.endLocal)!;
+    <Form {...form}>
+      <form
+        className={cn("grid gap-4", className)}
+        onSubmit={form.handleSubmit(async (values) => {
+          const start = fromLocalDatetimeInputValue(values.startLocal)!;
+          const end = fromLocalDatetimeInputValue(values.endLocal)!;
 
-        const draft: CalendarEventDraft = {
-          title: values.title.trim(),
-          description: values.description?.trim()
-            ? values.description.trim()
-            : undefined,
-          startAtISO: start.toISOString(),
-          endAtISO: end.toISOString(),
-        };
+          const draft: CalendarEventDraft = {
+            title: values.title.trim(),
+            description: values.description?.trim()
+              ? values.description.trim()
+              : undefined,
+            startAtISO: start.toISOString(),
+            endAtISO: end.toISOString(),
+          };
 
-        if (isEditMode && initialEvent) {
-          await onSubmitUpdate?.({
-            ...draft,
-            id: initialEvent.id,
-            createdAtISO: initialEvent.createdAtISO,
-          });
-        } else {
-          await onSubmitDraft(draft);
-        }
-      })}
-    >
-      <div className="grid gap-1.5">
-        <label className="text-sm font-medium" htmlFor="event-title">
-          Título*
-        </label>
-        <Input
-          id="event-title"
-          placeholder="Ex: Consulta, Reunião, Treino..."
-          {...register("title")}
+          if (isEditMode && initialEvent) {
+            await onSubmitUpdate?.({
+              ...draft,
+              id: initialEvent.id,
+              createdAtISO: initialEvent.createdAtISO,
+            });
+          } else {
+            await onSubmitDraft(draft);
+          }
+        })}
+      >
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem className="grid gap-1.5">
+              <FormLabel>Título*</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Ex: Consulta, Reunião, Treino..."
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
         />
-        {errors.title ? (
-          <p className="text-xs text-destructive">{errors.title.message}</p>
-        ) : null}
-      </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
-        <div className="grid grid-rows-[auto_auto_1.25rem] gap-1.5">
-          <label className="text-sm font-medium" htmlFor="event-start">
-            Início
-          </label>
-          <Input
-            id="event-start"
-            type="datetime-local"
-            {...register("startLocal")}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:items-start">
+          <FormField
+            control={form.control}
+            name="startLocal"
+            render={({ field }) => (
+              <FormItem className="grid grid-rows-[auto_auto_1.25rem] gap-1.5">
+                <FormLabel>Início</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" {...field} />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
           />
-          <div className="flex h-5 items-center">
-            {errors.startLocal ? (
-              <p className="text-xs text-destructive">
-                {errors.startLocal.message}
-              </p>
-            ) : null}
-          </div>
+
+          <FormField
+            control={form.control}
+            name="endLocal"
+            render={({ field }) => (
+              <FormItem className="grid grid-rows-[auto_auto_1.25rem] gap-1.5">
+                <FormLabel>Fim (range máximo de 24h)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="datetime-local"
+                    min={minEnd || undefined}
+                    max={maxEnd || undefined}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
         </div>
 
-        <div className="grid grid-rows-[auto_auto_1.25rem] gap-1.5">
-          <label className="text-sm font-medium" htmlFor="event-end">
-            Fim (range máximo de 24h)
-          </label>
-          <Input
-            id="event-end"
-            type="datetime-local"
-            {...register("endLocal")}
-            min={minEnd || undefined}
-            max={maxEnd || undefined}
-          />
-          <div className="flex h-5 items-center">
-            {errors.endLocal ? (
-              <p className="text-xs text-destructive">
-                {errors.endLocal.message}
-              </p>
-            ) : null}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-1.5">
-        <label className="text-sm font-medium" htmlFor="event-description">
-          Descrição (opcional)
-        </label>
-        <Textarea
-          id="event-description"
-          placeholder="Adicione detalhes, local, link..."
-          className="min-h-20 resize-none"
-          {...register("description")}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className="grid gap-1.5">
+              <FormLabel>Descrição (opcional)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Adicione detalhes, local, link..."
+                  className="min-h-20 resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage className="text-xs" />
+            </FormItem>
+          )}
         />
-        {errors.description ? (
-          <p className="text-xs text-destructive">
-            {errors.description.message}
-          </p>
-        ) : null}
-      </div>
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={isSubmitting}
-        >
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={!isValid || isSubmitting}>
-          {isSubmitting
-            ? isEditMode
-              ? "Atualizando..."
-              : "Salvando..."
-            : isEditMode
-              ? "Atualizar"
-              : "Salvar"}
-        </Button>
-      </div>
-    </form>
+        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={!isValid || isSubmitting}>
+            {isSubmitting
+              ? isEditMode
+                ? "Atualizando..."
+                : "Salvando..."
+              : isEditMode
+                ? "Atualizar"
+                : "Salvar"}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }
