@@ -1,6 +1,6 @@
 "use client";
 
-import { addDays } from "date-fns";
+import { addDays, setHours, setMinutes } from "date-fns";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -9,6 +9,54 @@ import type {
   CalendarEventDraft,
 } from "@/components/calendar/types";
 import { dayKey, dayKeyToLocalStart } from "@/utils/time";
+
+function getMockEvents(): CalendarEvent[] {
+  const base = new Date();
+  const today = (d: Date) => setMinutes(setHours(d, 0), 0);
+
+  return [
+    {
+      id: "mock-1",
+      title: "Consulta médica",
+      description: "Check-up de rotina",
+      startAtISO: setMinutes(setHours(addDays(base, 0), 9), 0).toISOString(),
+      endAtISO: setMinutes(setHours(addDays(base, 0), 10), 0).toISOString(),
+      createdAtISO: today(base).toISOString(),
+    },
+    {
+      id: "mock-2",
+      title: "Reunião da equipe",
+      description: "Planejamento semanal",
+      startAtISO: setMinutes(setHours(addDays(base, 0), 14), 0).toISOString(),
+      endAtISO: setMinutes(setHours(addDays(base, 0), 15), 30).toISOString(),
+      createdAtISO: today(base).toISOString(),
+    },
+    {
+      id: "mock-3",
+      title: "Academia",
+      description: "Treino de força",
+      startAtISO: setMinutes(setHours(addDays(base, 1), 7), 0).toISOString(),
+      endAtISO: setMinutes(setHours(addDays(base, 1), 8), 0).toISOString(),
+      createdAtISO: today(base).toISOString(),
+    },
+    {
+      id: "mock-4",
+      title: "Dentista",
+      description: "Limpeza e avaliação",
+      startAtISO: setMinutes(setHours(addDays(base, 2), 10), 0).toISOString(),
+      endAtISO: setMinutes(setHours(addDays(base, 2), 11), 0).toISOString(),
+      createdAtISO: today(base).toISOString(),
+    },
+    {
+      id: "mock-5",
+      title: "Café com cliente",
+      description: "Apresentação do projeto",
+      startAtISO: setMinutes(setHours(addDays(base, 3), 15), 0).toISOString(),
+      endAtISO: setMinutes(setHours(addDays(base, 3), 16), 30).toISOString(),
+      createdAtISO: today(base).toISOString(),
+    },
+  ].sort((a, b) => a.startAtISO.localeCompare(b.startAtISO));
+}
 
 type EventsState = {
   version: 1;
@@ -46,7 +94,7 @@ export const useEventsStore = create<EventsState>()(
   persist(
     (set, get) => ({
       version: 1,
-      events: [],
+      events: getMockEvents(),
       hasHydrated: false,
 
       addEvent: (draft) => {

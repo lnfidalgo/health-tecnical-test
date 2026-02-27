@@ -220,7 +220,7 @@ export default function Home() {
             <Select value={view} onValueChange={handleViewChange}>
               <SelectTrigger
                 size="sm"
-                className="min-h-11 flex-1 touch-manipulation md:min-h-8 md:w-28 md:flex-initial"
+                className="min-h-11 flex-1 touch-manipulation md:min-h-8 md:w-32 md:flex-initial"
               >
                 <CalendarDaysIcon className="size-4 shrink-0 opacity-70" />
                 <SelectValue placeholder="Visualização" />
